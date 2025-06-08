@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Boutique - Digitization Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>
+    <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Elite Boutique&quot;,&quot;short_name&quot;:&quot;EliteBoutique&quot;,&quot;display&quot;:&quot;standalone&quot;}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>Elite Boutique</h2>
+                <p class="gst-number">GST: 07AABCE2207R1Z5</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#" data-module="dashboard" class="nav-item active">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a></li>
+                <li><a href="#" data-module="customers" class="nav-item">
+                    <span class="nav-icon">👥</span> Customers
+                </a></li>
+                <li><a href="#" data-module="inventory" class="nav-item">
+                    <span class="nav-icon">🧵</span> Inventory
+                </a></li>
+                <li><a href="#" data-module="orders" class="nav-item">
+                    <span class="nav-icon">📋</span> Orders
+                </a></li>
+                <li><a href="#" data-module="design" class="nav-item">
+                    <span class="nav-icon">✏️</span> Design Canvas
+                </a></li>
+                <li><a href="#" data-module="virtual-tryOn" class="nav-item">
+                    <span class="nav-icon">👗</span> Virtual Try-On
+                </a></li>
+                <li><a href="#" data-module="billing" class="nav-item">
+                    <span class="nav-icon">💰</span> Billing
+                </a></li>
+                <li><a href="#" data-module="analytics" class="nav-item">
+                    <span class="nav-icon">📈</span> Analytics
+                </a></li>
+                <li><a href="#" data-module="staff" class="nav-item">
+                    <span class="nav-icon">👷</span> Staff
+                </a></li>
+                <li><a href="#" data-module="settings" class="nav-item">
+                    <span class="nav-icon">⚙️</span> Settings
+                </a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Module -->
+            <div id="dashboard" class="module active">
+                <header class="module-header">
+                    <h1>Dashboard</h1>
+                    <div class="quick-actions">
+                        <button class="btn btn--primary" onclick="showModule('orders'); showNewOrderForm()">New Order</button>
+                        <button class="btn btn--secondary" onclick="showModule('customers'); showNewCustomerForm()">Add Customer</button>
+                    </div>
+                </header>
+                
+                <div class="dashboard-grid">
+                    <div class="metric-cards">
+                        <div class="card metric-card">
+                            <h3>Total Customers</h3>
+                            <div class="metric-value">247</div>
+                            <div class="metric-change">+5 this month</div>
+                        </div>
+                        <div class="card metric-card">
+                            <h3>Active Orders</h3>
+                            <div class="metric-value">15</div>
+                            <div class="metric-change">3 due today</div>
+                        </div>
+                        <div class="card metric-card">
+                            <h3>Monthly Revenue</h3>
+                            <div class="metric-value">₹1,25,000</div>
+                            <div class="metric-change">+8% from last month</div>
+                        </div>
+                        <div class="card metric-card">
+                            <h3>Low Stock Alerts</h3>
+                            <div class="metric-value warning">8</div>
+                            <div class="metric-change">Items need reorder</div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-charts">
+                        <div class="card">
+                            <h3>Monthly Sales Trend</h3>
+                            <div class="chart-container">
+                                <canvas id="salesChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-orders">
+                        <div class="card">
+                            <h3>Recent Orders</h3>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Customer</th>
+                                            <th>Items</th>
+                                            <th>Status</th>
+                                            <th>Amount</th>
+                                            <th>Delivery</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentOrdersTable">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Management Module -->
+            <div id="customers" class="module">
+                <header class="module-header">
+                    <h1>Customer Management</h1>
+                    <div class="header-actions">
+                        <input type="text" class="form-control search-input" placeholder="Search customers..." id="customerSearch">
+                        <button class="btn btn--primary" onclick="showNewCustomerForm()">Add Customer</button>
+                    </div>
+                </header>
+
+                <div class="customer-list">
+                    <div class="card">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Phone</th>
+                                        <th>Orders</th>
+                                        <th>Total Value</th>
+                                        <th>Last Order</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customerTable">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Form Modal -->
+                <div id="customerModal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 id="customerModalTitle">Add New Customer</h2>
+                            <button class="close-btn" onclick="closeModal('customerModal')">&times;</button>
+                        </div>
+                        <form id="customerForm" class="modal-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" name="name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" name="phone" placeholder="+91 XXXXX XXXXX" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" name="email">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">VIP Status</label>
+                                    <select class="form-control" name="vip">
+                                        <option value="false">Regular</option>
+                                        <option value="true">VIP</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" name="address" rows="3"></textarea>
+                            </div>
+                            <div class="measurements-section">
+                                <h3>Measurements (in inches)</h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Chest/Bust</label>
+                                        <input type="number" class="form-control" name="chest" step="0.5">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Waist</label>
+                                        <input type="number" class="form-control" name="waist" step="0.5">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Hips/Inseam</label>
+                                        <input type="number" class="form-control" name="hips" step="0.5">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Sleeve</label>
+                                        <input type="number" class="form-control" name="sleeve" step="0.5">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn--secondary" onclick="closeModal('customerModal')">Cancel</button>
+                                <button type="submit" class="btn btn--primary">Save Customer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Management Module -->
+            <div id="inventory" class="module">
+                <header class="module-header">
+                    <h1>Inventory Management</h1>
+                    <div class="header-actions">
+                        <input type="text" class="form-control search-input" placeholder="Search fabrics..." id="fabricSearch">
+                        <button class="btn btn--secondary" onclick="scanBarcode()">📱 Scan Barcode</button>
+                        <button class="btn btn--primary" onclick="showNewFabricForm()">Add Fabric</button>
+                    </div>
+                </header>
+
+                <div class="inventory-filters">
+                    <div class="filter-group">
+                        <label>Category:</label>
+                        <select id="categoryFilter" class="form-control">
+                            <option value="">All Categories</option>
+                            <option value="Cotton">Cotton</option>
+                            <option value="Silk">Silk</option>
+                            <option value="Wool">Wool</option>
+                            <option value="Linen">Linen</option>
+                            <option value="Synthetic">Synthetic</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Stock Level:</label>
+                        <select id="stockFilter" class="form-control">
+                            <option value="">All Stock Levels</option>
+                            <option value="high">High (>30)</option>
+                            <option value="medium">Medium (11-30)</option>
+                            <option value="low">Low (1-10)</option>
+                            <option value="out">Out of Stock</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="fabric-grid" id="fabricGrid">
+                    <!-- Populated by JavaScript -->
+                </div>
+
+                <!-- Fabric Form Modal -->
+                <div id="fabricModal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Add New Fabric</h2>
+                            <button class="close-btn" onclick="closeModal('fabricModal')">&times;</button>
+                        </div>
+                        <form id="fabricForm" class="modal-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Fabric Name</label>
+                                    <input type="text" class="form-control" name="name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Category</label>
+                                    <select class="form-control" name="category" required>
+                                        <option value="">Select Category</option>
+                                        <option value="Cotton">Cotton</option>
+                                        <option value="Silk">Silk</option>
+                                        <option value="Wool">Wool</option>
+                                        <option value="Linen">Linen</option>
+                                        <option value="Synthetic">Synthetic</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Stock Quantity</label>
+                                    <input type="number" class="form-control" name="stock" required min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Unit</label>
+                                    <select class="form-control" name="unit">
+                                        <option value="meters">Meters</option>
+                                        <option value="yards">Yards</option>
+                                        <option value="pieces">Pieces</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Price per Unit (₹)</label>
+                                    <input type="number" class="form-control" name="price" required min="0" step="0.01">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Supplier</label>
+                                    <input type="text" class="form-control" name="supplier" required>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn--secondary" onclick="closeModal('fabricModal')">Cancel</button>
+                                <button type="submit" class="btn btn--primary">Save Fabric</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Management Module -->
+            <div id="orders" class="module">
+                <header class="module-header">
+                    <h1>Order Management</h1>
+                    <div class="header-actions">
+                        <select id="statusFilter" class="form-control">
+                            <option value="">All Status</option>
+                            <option value="New">New</option>
+                            <option value="Measurement">Measurement</option>
+                            <option value="Production">Production</option>
+                            <option value="Ready">Ready</option>
+                            <option value="Delivered">Delivered</option>
+                        </select>
+                        <button class="btn btn--primary" onclick="showNewOrderForm()">New Order</button>
+                    </div>
+                </header>
+
+                <div class="orders-list">
+                    <div class="card">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Items</th>
+                                        <th>Fabric</th>
+                                        <th>Status</th>
+                                        <th>Order Date</th>
+                                        <th>Delivery Date</th>
+                                        <th>Amount</th>
+                                        <th>Assigned To</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ordersTable">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Form Modal -->
+                <div id="orderModal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Create New Order</h2>
+                            <button class="close-btn" onclick="closeModal('orderModal')">&times;</button>
+                        </div>
+                        <form id="orderForm" class="modal-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Customer</label>
+                                    <select class="form-control" name="customer" required id="orderCustomerSelect">
+                                        <option value="">Select Customer</option>
+                                        <!-- Populated by JavaScript -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Items</label>
+                                    <input type="text" class="form-control" name="items" placeholder="e.g., 3-Piece Suit, Party Dress" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Fabric</label>
+                                    <select class="form-control" name="fabric" required id="orderFabricSelect">
+                                        <option value="">Select Fabric</option>
+                                        <!-- Populated by JavaScript -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Amount (₹)</label>
+                                    <input type="number" class="form-control" name="amount" required min="0">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Delivery Date</label>
+                                    <input type="date" class="form-control" name="deliveryDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Assign To</label>
+                                    <select class="form-control" name="assignedTo" required>
+                                        <option value="">Select Staff</option>
+                                        <option value="Ramesh (Tailor)">Ramesh (Tailor)</option>
+                                        <option value="Sunita (Designer)">Sunita (Designer)</option>
+                                        <option value="Mohan (Tailor)">Mohan (Tailor)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Special Instructions</label>
+                                <textarea class="form-control" name="instructions" rows="3" placeholder="Any special requirements..."></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn--secondary" onclick="closeModal('orderModal')">Cancel</button>
+                                <button type="submit" class="btn btn--primary">Create Order</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Design Canvas Module -->
+            <div id="design" class="module">
+                <header class="module-header">
+                    <h1>Design Canvas</h1>
+                    <div class="header-actions">
+                        <button class="btn btn--secondary" onclick="clearCanvas()">Clear Canvas</button>
+                        <button class="btn btn--secondary" onclick="loadTemplate()">Load Template</button>
+                        <button class="btn btn--primary" onclick="saveDesign()">Save Design</button>
+                    </div>
+                </header>
+
+                <div class="design-workspace">
+                    <div class="design-tools">
+                        <div class="tool-group">
+                            <h4>Drawing Tools</h4>
+                            <div class="tools">
+                                <button class="tool-btn active" onclick="setDrawingTool('pencil')">✏️ Pencil</button>
+                                <button class="tool-btn" onclick="setDrawingTool('brush')">🖌️ Brush</button>
+                                <button class="tool-btn" onclick="setDrawingTool('line')">📏 Line</button>
+                                <button class="tool-btn" onclick="setDrawingTool('circle')">⭕ Circle</button>
+                                <button class="tool-btn" onclick="setDrawingTool('rectangle')">▭ Rectangle</button>
+                            </div>
+                        </div>
+                        <div class="tool-group">
+                            <h4>Fabric Swatches</h4>
+                            <div class="fabric-swatches" id="fabricSwatches">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="tool-group">
+                            <h4>Measurements Guide</h4>
+                            <button class="btn btn--secondary btn--sm" onclick="toggleMeasurementGuide()">Show/Hide Guide</button>
+                        </div>
+                    </div>
+                    <div class="canvas-area">
+                        <canvas id="designCanvas" width="800" height="600"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Virtual Try-On Module -->
+            <div id="virtual-tryOn" class="module">
+                <header class="module-header">
+                    <h1>Virtual Try-On (AI Powered)</h1>
+                    <div class="header-actions">
+                        <button class="btn btn--secondary" onclick="shareTriedOn()">📤 Share Result</button>
+                        <button class="btn btn--primary" onclick="saveTriedOn()">💾 Save to Profile</button>
+                    </div>
+                </header>
+
+                <div class="virtual-tryOn-workspace">
+                    <div class="upload-section">
+                        <div class="card">
+                            <h3>Upload Customer Photo</h3>
+                            <div class="upload-area" onclick="document.getElementById('photoUpload').click()">
+                                <div class="upload-placeholder" id="photoPreview">
+                                    <span>📷 Click to upload photo</span>
+                                </div>
+                                <input type="file" id="photoUpload" accept="image/*" style="display: none;" onchange="previewPhoto(this)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="garment-selection">
+                        <div class="card">
+                            <h3>Select Garment</h3>
+                            <div class="garment-options">
+                                <div class="garment-category">
+                                    <h4>Formal Wear</h4>
+                                    <div class="garment-items">
+                                        <div class="garment-item" onclick="selectGarment('suit')">
+                                            <div class="garment-preview">👔</div>
+                                            <span>3-Piece Suit</span>
+                                        </div>
+                                        <div class="garment-item" onclick="selectGarment('shirt')">
+                                            <div class="garment-preview">👔</div>
+                                            <span>Formal Shirt</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="garment-category">
+                                    <h4>Traditional Wear</h4>
+                                    <div class="garment-items">
+                                        <div class="garment-item" onclick="selectGarment('kurta')">
+                                            <div class="garment-preview">🥻</div>
+                                            <span>Kurta</span>
+                                        </div>
+                                        <div class="garment-item" onclick="selectGarment('dress')">
+                                            <div class="garment-preview">👗</div>
+                                            <span>Party Dress</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tryOn-result">
+                        <div class="card">
+                            <h3>Try-On Result</h3>
+                            <div class="result-display" id="tryOnResult">
+                                <div class="result-placeholder">
+                                    <span>Upload photo and select garment to see virtual try-on</span>
+                                </div>
+                            </div>
+                            <div class="ai-recommendations" id="aiRecommendations" style="display: none;">
+                                <h4>AI Recommendations</h4>
+                                <div class="recommendations">
+                                    <!-- Populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Billing Module -->
+            <div id="billing" class="module">
+                <header class="module-header">
+                    <h1>Billing & Payments</h1>
+                    <div class="header-actions">
+                        <button class="btn btn--secondary" onclick="viewBillHistory()">Bill History</button>
+                        <button class="btn btn--primary" onclick="createNewBill()">Create Bill</button>
+                    </div>
+                </header>
+
+                <div class="billing-workspace">
+                    <div class="bill-creation">
+                        <div class="card">
+                            <h3>Create GST Bill</h3>
+                            <form id="billForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Select Order</label>
+                                        <select class="form-control" name="orderId" required id="billOrderSelect">
+                                            <option value="">Select Order</option>
+                                            <!-- Populated by JavaScript -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Bill Date</label>
+                                        <input type="date" class="form-control" name="billDate" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="bill-details" id="billDetails" style="display: none;">
+                                    <h4>Bill Details</h4>
+                                    <div class="bill-summary">
+                                        <div class="summary-row">
+                                            <span>Subtotal:</span>
+                                            <span id="subtotal">₹0</span>
+                                        </div>
+                                        <div class="summary-row">
+                                            <span>CGST (9%):</span>
+                                            <span id="cgst">₹0</span>
+                                        </div>
+                                        <div class="summary-row">
+                                            <span>SGST (9%):</span>
+                                            <span id="sgst">₹0</span>
+                                        </div>
+                                        <div class="summary-row total">
+                                            <span>Total Amount:</span>
+                                            <span id="totalAmount">₹0</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="payment-methods">
+                                    <h4>Payment Method</h4>
+                                    <div class="payment-options">
+                                        <label class="payment-option">
+                                            <input type="radio" name="paymentMethod" value="cash" checked>
+                                            <span>💵 Cash</span>
+                                        </label>
+                                        <label class="payment-option">
+                                            <input type="radio" name="paymentMethod" value="upi">
+                                            <span>📱 UPI</span>
+                                        </label>
+                                        <label class="payment-option">
+                                            <input type="radio" name="paymentMethod" value="card">
+                                            <span>💳 Card</span>
+                                        </label>
+                                        <label class="payment-option">
+                                            <input type="radio" name="paymentMethod" value="netbanking">
+                                            <span>🏦 Net Banking</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn--secondary" onclick="previewBill()">Preview Bill</button>
+                                    <button type="submit" class="btn btn--primary">Generate & Send Bill</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="quick-payments">
+                        <div class="card">
+                            <h3>Quick Payment Links</h3>
+                            <div class="payment-gateways">
+                                <button class="gateway-btn" onclick="openPaymentGateway('razorpay')">
+                                    <span>Razorpay</span>
+                                </button>
+                                <button class="gateway-btn" onclick="openPaymentGateway('paytm')">
+                                    <span>Paytm Business</span>
+                                </button>
+                                <button class="gateway-btn" onclick="openPaymentGateway('phonepe')">
+                                    <span>PhonePe</span>
+                                </button>
+                                <button class="gateway-btn" onclick="openPaymentGateway('googlepay')">
+                                    <span>Google Pay</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Module -->
+            <div id="analytics" class="module">
+                <header class="module-header">
+                    <h1>Analytics & Reports</h1>
+                    <div class="header-actions">
+                        <select class="form-control" id="analyticsTimeframe">
+                            <option value="week">This Week</option>
+                            <option value="month" selected>This Month</option>
+                            <option value="quarter">This Quarter</option>
+                            <option value="year">This Year</option>
+                        </select>
+                        <button class="btn btn--secondary" onclick="exportReports()">📊 Export Reports</button>
+                    </div>
+                </header>
+
+                <div class="analytics-dashboard">
+                    <div class="analytics-cards">
+                        <div class="card metric-card">
+                            <h3>Revenue Growth</h3>
+                            <div class="metric-value success">+12.5%</div>
+                            <div class="metric-change">Compared to last month</div>
+                        </div>
+                        <div class="card metric-card">
+                            <h3>Customer Retention</h3>
+                            <div class="metric-value">78%</div>
+                            <div class="metric-change">5 repeat customers</div>
+                        </div>
+                        <div class="card metric-card">
+                            <h3>Avg Order Value</h3>
+                            <div class="metric-value">₹8,333</div>
+                            <div class="metric-change">+₹500 from last month</div>
+                        </div>
+                        <div class="card metric-card">
+                            <h3>On-Time Delivery</h3>
+                            <div class="metric-value success">92%</div>
+                            <div class="metric-change">Above target</div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-charts">
+                        <div class="card">
+                            <h3>Revenue Trend</h3>
+                            <div class="chart-container">
+                                <canvas id="revenueChart" height="300"></canvas>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3>Popular Fabrics</h3>
+                            <div class="chart-container">
+                                <canvas id="fabricChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reports-section">
+                        <div class="card">
+                            <h3>Download Reports</h3>
+                            <div class="report-options">
+                                <button class="btn btn--outline" onclick="downloadReport('sales')">📈 Sales Report</button>
+                                <button class="btn btn--outline" onclick="downloadReport('inventory')">📦 Inventory Report</button>
+                                <button class="btn btn--outline" onclick="downloadReport('customer')">👥 Customer Report</button>
+                                <button class="btn btn--outline" onclick="downloadReport('gst')">🧾 GST Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff Management Module -->
+            <div id="staff" class="module">
+                <header class="module-header">
+                    <h1>Staff Management</h1>
+                    <div class="header-actions">
+                        <button class="btn btn--secondary" onclick="markAttendance()">📅 Mark Attendance</button>
+                        <button class="btn btn--primary" onclick="addNewStaff()">Add Staff</button>
+                    </div>
+                </header>
+
+                <div class="staff-overview">
+                    <div class="staff-cards">
+                        <div class="card">
+                            <h3>Today's Attendance</h3>
+                            <div class="attendance-summary">
+                                <div class="attendance-stat">
+                                    <span class="stat-number">3</span>
+                                    <span class="stat-label">Present</span>
+                                </div>
+                                <div class="attendance-stat">
+                                    <span class="stat-number">0</span>
+                                    <span class="stat-label">Absent</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3>Monthly Performance</h3>
+                            <div class="performance-summary">
+                                <div class="performance-stat">
+                                    <span class="stat-number">28</span>
+                                    <span class="stat-label">Orders Completed</span>
+                                </div>
+                                <div class="performance-stat">
+                                    <span class="stat-number">95%</span>
+                                    <span class="stat-label">Quality Score</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="staff-list">
+                        <div class="card">
+                            <h3>Staff Directory</h3>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Role</th>
+                                            <th>Experience</th>
+                                            <th>Phone</th>
+                                            <th>Salary</th>
+                                            <th>Performance</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="staffTable">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Module -->
+            <div id="settings" class="module">
+                <header class="module-header">
+                    <h1>Settings</h1>
+                </header>
+
+                <div class="settings-sections">
+                    <div class="card">
+                        <h3>Business Information</h3>
+                        <form id="businessSettingsForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Business Name</label>
+                                    <input type="text" class="form-control" name="businessName" value="Elite Boutique">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">GST Number</label>
+                                    <input type="text" class="form-control" name="gstNumber" value="07AABCE2207R1Z5">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Business Address</label>
+                                <textarea class="form-control" name="businessAddress" rows="3">123 Fashion Street, Commercial Complex, Bangalore - 560001</textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" class="form-control" name="businessPhone" value="+91 80 2345 6789">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" name="businessEmail" value="info@eliteboutique.com">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h3>Integration Settings</h3>
+                        <div class="integration-settings">
+                            <div class="integration-item">
+                                <div class="integration-info">
+                                    <h4>WhatsApp Business</h4>
+                                    <p>Send order updates and notifications</p>
+                                </div>
+                                <div class="integration-status">
+                                    <span class="status status--success">Connected</span>
+                                    <button class="btn btn--sm btn--secondary">Configure</button>
+                                </div>
+                            </div>
+                            <div class="integration-item">
+                                <div class="integration-info">
+                                    <h4>Payment Gateways</h4>
+                                    <p>Razorpay, Paytm, UPI integrations</p>
+                                </div>
+                                <div class="integration-status">
+                                    <span class="status status--success">Active</span>
+                                    <button class="btn btn--sm btn--secondary">Manage</button>
+                                </div>
+                            </div>
+                            <div class="integration-item">
+                                <div class="integration-info">
+                                    <h4>Gemini AI (Virtual Try-On)</h4>
+                                    <p>AI-powered virtual garment try-on</p>
+                                </div>
+                                <div class="integration-status">
+                                    <span class="status status--success">Enabled</span>
+                                    <button class="btn btn--sm btn--secondary">Settings</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Notification Preferences</h3>
+                        <div class="notification-settings">
+                            <label class="notification-option">
+                                <input type="checkbox" checked>
+                                <span>Order status updates via WhatsApp</span>
+                            </label>
+                            <label class="notification-option">
+                                <input type="checkbox" checked>
+                                <span>Low stock alerts</span>
+                            </label>
+                            <label class="notification-option">
+                                <input type="checkbox" checked>
+                                <span>Daily sales summary</span>
+                            </label>
+                            <label class="notification-option">
+                                <input type="checkbox">
+                                <span>Customer birthday reminders</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Data & Backup</h3>
+                        <div class="backup-settings">
+                            <div class="backup-item">
+                                <div class="backup-info">
+                                    <h4>Automatic Backup</h4>
+                                    <p>Last backup: May 30, 2025 - 11:45 PM</p>
+                                </div>
+                                <button class="btn btn--secondary">Backup Now</button>
+                            </div>
+                            <div class="backup-item">
+                                <div class="backup-info">
+                                    <h4>Export Data</h4>
+                                    <p>Download all your business data</p>
+                                </div>
+                                <button class="btn btn--secondary">Export</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Utility Panel -->
+        <aside class="utility-panel">
+            <div class="notifications">
+                <h3>Notifications</h3>
+                <div class="notification-item urgent">
+                    <span class="notification-icon">⚠️</span>
+                    <div class="notification-content">
+                        <div class="notification-title">Low Stock Alert</div>
+                        <div class="notification-desc">Linen Natural Beige - 8 meters left</div>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <span class="notification-icon">📋</span>
+                    <div class="notification-content">
+                        <div class="notification-title">Order Due Today</div>
+                        <div class="notification-desc">Order #1003 - Amit Singh</div>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <span class="notification-icon">🎉</span>
+                    <div class="notification-content">
+                        <div class="notification-title">Birthday Reminder</div>
+                        <div class="notification-desc">Priya Sharma - June 2nd</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-stats">
+                <h3>Today's Summary</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Orders Received</span>
+                    <span class="stat-value">3</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Orders Completed</span>
+                    <span class="stat-value">2</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Revenue</span>
+                    <span class="stat-value">₹12,500</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Pending Tasks</span>
+                    <span class="stat-value warning">5</span>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="message-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
